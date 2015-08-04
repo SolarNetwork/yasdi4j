@@ -9,6 +9,7 @@
 #elif defined YASDI_EVENT_DEVICE_ADDED
 #define _YASDI_VER _YASDI_1_8
 #endif
+#define _YASDI_VER _YASDI_1_8
 
 /* the maximum nr of devices that can be handled */
 #define MAX_NR_DEVICES 100

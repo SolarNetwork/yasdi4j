@@ -1,5 +1,7 @@
 CPPFLAGS += -I$(JAVA_HOME)/include -I$(YASDI)/include
-LDFLAGS += -L$(YASDI)/lib -Wl,-rpath-link,$(YASDI)/lib
+LDFLAGS += -L$(YASDI)/lib
+# On clang, the -Wl is not supported
+#LDFLAGS += -L$(YASDI)/lib -Wl,$(YASDI)/lib
 LDLIBS += -lyasdimaster
 
 ifdef WINDIR
