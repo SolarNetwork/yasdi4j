@@ -1,4 +1,6 @@
+/build/
 Makefile.local
 *.o
 *.dylib
+*.jar
 
