@@ -1,0 +1,41 @@
+CPPFLAGS += -I$(JAVA_HOME)/include -I$(YASDI)/include
+LDFLAGS += -L$(YASDI)/lib -Wl,-rpath-link,$(YASDI)/lib
+LDLIBS += -lyasdimaster
+
+ifdef WINDIR
+CPPFLAGS += -I$(JAVA_HOME)/include/win32
+LDFLAGS += -Wl,--kill-at
+DEFS += -D_JNI_IMPLEMENTATION_
+# DEFS += -D__int64=\"long long\"
+YASDI4J_LIB = yasdi4j.dll
+else
+CPPFLAGS += -I$(JAVA_HOME)/include/linux
+YASDI4J_LIB = libyasdi4j.so
+endif
+
+JAVAH = $(JAVA_HOME)/bin/javah
+
+pkg1 = de.michaeldenk.yasdi4j
+pkg2 = de/michaeldenk/yasdi4j
+pkg3 = de_michaeldenk_yasdi4j
+
+
+header: $(pkg3)_YasdiMaster.h $(pkg3)_YasdiChannel.h $(pkg3)_YasdiDevice.h
+
+$(pkg3)_YasdiMaster.h: ../build/$(pkg2)/YasdiMaster.class
+	$(JAVAH) -classpath ../build $(pkg1).YasdiMaster
+
+$(pkg3)_YasdiChannel.h: ../build/$(pkg2)/YasdiChannel.class
+	$(JAVAH) -classpath ../build $(pkg1).YasdiChannel
+
+$(pkg3)_YasdiDevice.h: ../build/$(pkg2)/YasdiDevice.class
+	$(JAVAH) -classpath ../build $(pkg1).YasdiDevice
+
+$(pkg3)_YasdiMaster.o $(pkg3)_YasdiChannel.o $(pkg3)_YasdiDevice.o: yasdi4j.h
+
+build: $(YASDI4J_LIB)
+
+$(YASDI4J_LIB): $(pkg3)_YasdiMaster.o $(pkg3)_YasdiChannel.o $(pkg3)_YasdiDevice.o
+	$(CC) $(DEFS) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS)
+
+.PHONY: header

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     09.07.2008 19:45:32                                                        
+
+     yasdi4j    
+     Java Binding for YASDI
+
+     Copyright (c) 2008 Michael Denk <code@michaeldenk.de>
+
+     Permission is hereby granted, free of charge, to any person
+     obtaining a copy of this software and associated documentation
+     files (the "Software"), to deal in the Software without
+     restriction, including without limitation the rights to use,
+     copy, modify, merge, publish, distribute, sublicense, and/or sell
+     copies of the Software, and to permit persons to whom the
+     Software is furnished to do so, subject to the following
+     conditions:
+
+     The above copyright notice and this permission notice shall be
+     included in all copies or substantial portions of the Software.
+ 
+     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+     NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+     OTHER DEALINGS IN THE SOFTWARE.
+     ====================================================================== -->
+<project name="yasdi4j" default="compile">
+  <description>
+            yasdi4j -- Java Binding for YASDI
+    </description>
+
+  <property name="build.dir" location="build" />
+  <property name="src.dir" location="src" />
+  <property name="version" value="0.1.5" />
+  <property name="jar.file" value="yasdi4j.jar" />
+  <property name="zip.file" value="yasdi4j-${version}-src.zip" />
+  <property name="jni.dir" location="jni" />
+  <property name="dist.dir" location="dist" />
+
+  <condition property="isWindows">
+    <os family="windows" />
+  </condition>
+  <condition property="isUnix">
+    <os family="unix" />
+  </condition>
+
+  <!-- - - - - - - - - - - - - - - - - - 
+          target: depends                      
+         - - - - - - - - - - - - - - - - - -->
+  <target name="depends">
+    <mkdir dir="${build.dir}" />
+  </target>
+
+  <!-- ================================= 
+          target: compile              
+         ================================= -->
+  <target name="compile" depends="depends" description="--> compile the project">
+    <javac srcdir="${src.dir}" destdir="${build.dir}" debug="on" />
+  </target>
+
+  <!-- ================================= 
+          target: jar              
+         ================================= -->
+  <target name="jar" depends="compile" description="--> create jar file">
+    <jar destfile="${jar.file}" basedir="${build.dir}" excludes="*.class, **/*.html" />
+  </target>
+
+  <!-- ================================= 
+          target: zip              
+         ================================= -->
+  <target name="zip" depends="depends" description="--> zip source files">
+    <zip destfile="${zip.file}">
+      <zipfileset dir="." includes="readme.txt, license.txt, build.xml, test.sh, test.bat, yasdi_linux.ini, yasdi_win.ini" prefix="yasdi4j-${version}" />
+      <zipfileset dir="${src.dir}" excludes="SolarSimTest.java" prefix="yasdi4j-${version}/src" />
+      <zipfileset dir="${jni.dir}" includes="Makefile*, **/*.c, **/*.h" prefix="yasdi4j-${version}/jni" />
+    </zip>
+  </target>
+
+  <!-- ================================= 
+          target: dist              
+         ================================= -->
+  <target name="dist" depends="jar" description="--> create distribution">
+    <mkdir dir="${dist.dir}" />
+    <copy file="${jar.file}" todir="${dist.dir}" />
+    <copy todir="${dist.dir}">
+      <fileset dir="." includes="readme.txt, license.txt" />
+    </copy>
+    <antcall target="copyWin" />
+    <antcall target="copyUnix" />
+  </target>
+
+  <target name="copyWin" if="isWindows">
+    <copy file="${jni.dir}/yasdi4j.dll" todir="${dist.dir}" />
+  </target>
+
+  <target name="copyUnix" if="isUnix">
+    <copy file="${jni.dir}/libyasdi4j.so" todir="${dist.dir}" />
+  </target>
+
+  <!-- ================================= 
+        target: bin              
+       ================================= -->
+  <target name="bin" depends="dist" description="--> create binary zip for 1.7.2">
+    <zip destfile="yasdi4j-${version}-bin-1.7.2-win32.zip">
+      <zipfileset dir="${dist.dir}" prefix="yasdi4j-${version}" />
+    </zip>
+  </target>
+
+  <!-- ================================= 
+      target: bin-1.8              
+     ================================= -->
+  <target name="bin-1.8" depends="dist" description="--> create binary zip for 1.8">
+    <zip destfile="yasdi4j-${version}-bin-1.8.0-win32.zip">
+      <zipfileset dir="${dist.dir}" prefix="yasdi4j-${version}" />
+    </zip>
+  </target>
+
+  <!-- ================================= 
+          target: clean              
+         ================================= -->
+  <target name="clean" description="--> clean up">
+    <delete dir="${build.dir}" />
+    <delete file="${jar.file}" />
+    <delete file="${zip.file}" />
+    <delete dir="${dist.dir}" />
+  </target>
+</project>
