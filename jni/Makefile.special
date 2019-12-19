@@ -1,4 +1,4 @@
-CPPFLAGS += -I$(JAVA_HOME)/include -I$(YASDI)/include
+CPPFLAGS += -I$(JAVA_HOME)/include -I$(YASDI)/include/yasdi
 LDFLAGS += -L$(YASDI)/lib
 # On clang, the -Wl is not supported
 #LDFLAGS += -L$(YASDI)/lib -Wl,$(YASDI)/lib
